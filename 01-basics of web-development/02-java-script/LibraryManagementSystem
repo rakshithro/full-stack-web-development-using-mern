@@ -1,0 +1,171 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+    // Book class to store book details
+    class Book {
+        private String title;
+        private String author;
+        private boolean isBorrowed;
+
+        public Book(String title, String author) {
+            this.title = title;
+            this.author = author;
+            this.isBorrowed = false;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getAuthor() {
+            return author;
+        }
+
+        public boolean isBorrowed() {
+            return isBorrowed;
+        }
+
+        public void borrowBook() {
+            if (!isBorrowed) {
+                isBorrowed = true;
+            }
+        }
+
+        public void returnBook() {
+            if (isBorrowed) {
+                isBorrowed = false;
+            }
+        }
+    }
+
+    // Main class with GUI
+    public class LibraryManagementGUI {
+        private JFrame frame;
+        private JTextArea displayArea;
+        private ArrayList<Book> books = new ArrayList<>();
+
+        public LibraryManagementGUI() {
+            // Frame
+            frame = new JFrame("Library Management System");
+            frame.setSize(500, 500);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLayout(new BorderLayout());
+
+            // Text Area to Display Books
+            displayArea = new JTextArea();
+            displayArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(displayArea);
+            frame.add(scrollPane, BorderLayout.CENTER);
+
+            // Buttons Panel
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new GridLayout(2, 2));
+
+            JButton addButton = new JButton("Add Book");
+            JButton viewButton = new JButton("View Books");
+            JButton borrowButton = new JButton("Borrow Book");
+            JButton returnButton = new JButton("Return Book");
+
+            // Add Action Listeners
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    addBook();
+                }
+            });
+
+            viewButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    viewBooks();
+                }
+            });
+
+            borrowButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    borrowBook();
+                }
+            });
+
+            returnButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    returnBook();
+                }
+            });
+
+            buttonPanel.add(addButton);
+            buttonPanel.add(viewButton);
+            buttonPanel.add(borrowButton);
+            buttonPanel.add(returnButton);
+
+            frame.add(buttonPanel, BorderLayout.SOUTH);
+            frame.setVisible(true);
+        }
+
+        // Method to add a book
+        private void addBook() {
+            String title = JOptionPane.showInputDialog("Enter book title:");
+            String author = JOptionPane.showInputDialog("Enter book author:");
+            if (title != null && author != null) {
+                books.add(new Book(title, author));
+                JOptionPane.showMessageDialog(frame, "Book added successfully!");
+            }
+        }
+
+        // Method to view books
+        private void viewBooks() {
+            if (books.isEmpty()) {
+                displayArea.setText("No books available in the library.");
+            } else {
+                StringBuilder bookList = new StringBuilder("Available Books:\n");
+                for (Book book : books) {
+                    bookList.append("- ").append(book.getTitle()).append(" by ").append(book.getAuthor())
+                            .append(book.isBorrowed() ? " (Borrowed)\n" : "\n");
+                }
+                displayArea.setText(bookList.toString());
+            }
+        }
+
+        // Method to borrow a book
+        private void borrowBook() {
+            String title = JOptionPane.showInputDialog("Enter book title to borrow:");
+            if (title != null) {
+                for (Book book : books) {
+                    if (book.getTitle().equalsIgnoreCase(title)) {
+                        if (!book.isBorrowed()) {
+                            book.borrowBook();
+                            JOptionPane.showMessageDialog(frame, "You borrowed \"" + book.getTitle() + "\"");
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Sorry, this book is already borrowed.");
+                        }
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Book not found.");
+            }
+        }
+
+        // Method to return a book
+        private void returnBook() {
+            String title = JOptionPane.showInputDialog("Enter book title to return:");
+            if (title != null) {
+                for (Book book : books) {
+                    if (book.getTitle().equalsIgnoreCase(title)) {
+                        if (book.isBorrowed()) {
+                            book.returnBook();
+                            JOptionPane.showMessageDialog(frame, "You returned \"" + book.getTitle() + "\"");
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "This book was not borrowed.");
+                        }
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Book not found.");
+            }
+        }
+
+        public static void main(String[] args) {
+            new LibraryManagementGUI();
+        }
+    }
